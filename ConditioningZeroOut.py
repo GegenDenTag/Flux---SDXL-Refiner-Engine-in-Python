@@ -15,6 +15,7 @@ class ConditioningZeroOut:
 
 # AND 
 
+
 def _process_prompt(self, prompt: str) -> str:
     """Returns ConditioningZeroOut for empty prompts"""
     if not prompt or prompt.strip() == "":
