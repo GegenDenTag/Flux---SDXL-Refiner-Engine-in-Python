@@ -22,7 +22,7 @@ class SDXLRefinerEngine:
         device: str = None,
         torch_dtype=torch.float16,
         num_inference_steps: int = 14,
-        guidance_scale: float = 8.0,
+        guidance_scale: float = 6.0,
         denoise_strength: float = 0.02,
     ):
         """
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     # Engine mit Standardwerten initialisieren (optimal für Flux-Branding-Entfernung)
     refiner = SDXLRefinerEngine(
         refiner_model_path="./sdxl_v10RefinerVAEFix.safetensors"
-        # Standardwerte: denoise_strength=0.02, steps=14, guidance=8.0
+        # Standardwerte: denoise_strength=0.02, steps=14, guidance=6.0
     )
     
     # Flux 1 Dev Bild verfeinern (typische Flux-Auflösungen)
