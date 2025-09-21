@@ -13,7 +13,7 @@ class SDXLRefinerEngine:
     Optimierte SDXL Refiner Engine zum Verfeinern von Flux 1 Dev generierten Bildern.
     Entfernt Branding-Effekte und Artefakte durch gezielten Refiner-Durchlauf
     mit niedrigem Denoise-Wert. Unterstützt variable Flux-Auflösungen mit
-    Aspect Ratio-Erhaltung (2:3, 16:9, Landscape, etc.).
+    Aspect Ratio-Erhaltung (2:3, 9:16, Landscape, etc.).
     """
     
     def __init__(
@@ -46,12 +46,12 @@ class SDXLRefinerEngine:
         
         # Denoise-Stärke validieren und begrenzen
         if denoise_strength > 0.02:
-            print(f"⚠️  Warnung: denoise_strength ({denoise_strength}) zu hoch! Wird auf 0.02 begrenzt.")
+            print(f"Warnung: denoise_strength ({denoise_strength}) zu hoch! Wird auf 0.02 begrenzt.")
             self.denoise_strength = 0.02
         else:
             self.denoise_strength = denoise_strength
             
-        print(f"🎛️  Denoise-Stärke: {self.denoise_strength} (niedrig für minimale Bildveränderung)")
+        print(f"Denoise-Stärke: {self.denoise_strength} (niedrig für minimale Bildveränderung)")
         
         # Refiner-Pipeline laden
         self._load_refiner_pipeline(refiner_model_path)
@@ -99,7 +99,7 @@ class SDXLRefinerEngine:
                 self.refiner_pipe.enable_model_cpu_offload()
                 self.refiner_pipe.enable_vae_slicing()
                 
-            print(f"✓ Refiner-Pipeline erfolgreich geladen auf {self.device}")
+            print(f"Refiner-Pipeline erfolgreich geladen auf {self.device}")
             
         except Exception as e:
             raise RuntimeError(f"Fehler beim Laden der Refiner-Pipeline: {e}")
@@ -163,13 +163,13 @@ class SDXLRefinerEngine:
             Latent-Tensor für die Refiner-Pipeline
         """
         original_size = image.size
-        print(f"📏 Original-Auflösung: {original_size[0]}x{original_size[1]}")
+        print(f"Original-Auflösung: {original_size[0]}x{original_size[1]}")
         
         # SDXL-kompatible Dimensionen berechnen
         target_width, target_height = self._get_compatible_dimensions(
             original_size[0], original_size[1]
         )
-        print(f"🎯 SDXL-Ziel-Auflösung: {target_width}x{target_height}")
+        print(f"SDXL-Ziel-Auflösung: {target_width}x{target_height}")
         
         # Bild auf SDXL-kompatible Größe skalieren (Aspect Ratio erhalten)
         image_resized = image.resize((target_width, target_height), Image.Resampling.LANCZOS)
@@ -224,11 +224,11 @@ class SDXLRefinerEngine:
         
         try:
             # Bild zu Latents konvertieren (mit Aspect Ratio-Erhaltung)
-            print("🔄 Konvertiere Flux-Bild zu SDXL-Latent-Repräsentation...")
+            print("Konvertiere Flux-Bild zu SDXL-Latent-Repräsentation...")
             latents = self._image_to_latents(image)
             
             # Refiner-Durchlauf mit niedrigem Denoise-Wert
-            print(f"✨ Starte Anti-Branding-Verarbeitung (Denoise: {self.denoise_strength})...")
+            print(f"Starte Anti-Branding-Verarbeitung (Denoise: {self.denoise_strength})...")
             with torch.autocast(self.device):
                 refined_result = self.refiner_pipe(
                     prompt=prompt,
@@ -243,10 +243,10 @@ class SDXLRefinerEngine:
             
             # Zurück auf Original-Größe skalieren falls gewünscht
             if return_original_size and refined_image.size != original_size:
-                print(f"📐 Skaliere zurück auf Original-Größe: {original_size[0]}x{original_size[1]}")
+                print(f"Skaliere zurück auf Original-Größe: {original_size[0]}x{original_size[1]}")
                 refined_image = refined_image.resize(original_size, Image.Resampling.LANCZOS)
             
-            print("✅ Flux-Branding-Entfernung abgeschlossen!")
+            print("Flux-Branding-Entfernung abgeschlossen!")
             return refined_image
             
         except Exception as e:
@@ -257,7 +257,7 @@ class SDXLRefinerEngine:
         if hasattr(self, 'refiner_pipe'):
             del self.refiner_pipe
             torch.cuda.empty_cache()
-            print("🧹 GPU-Speicher freigegeben")
+            print("GPU-Speicher freigegeben")
 
 
 # Beispiel-Verwendung für Flux 1 Dev Anti-Branding
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     )
     
     # Flux 1 Dev Bild verfeinern (typische Flux-Auflösungen)
-    flux_image_path = "flux_generated_image.png"  # z.B. 832x1216 (2:3) oder 1344x768 (16:9)
+    flux_image_path = "flux_generated_image.png"  # z.B. 832x1216 (2:3) oder 768x1344 (9:16)
     original_prompt = "A majestic fox in a lush forest, cinematic lighting"
     original_seed = 1234
     
@@ -283,10 +283,10 @@ if __name__ == "__main__":
         
         # Anti-Branding verfeinertes Bild speichern
         refined_image.save("flux_debrand_output.png")
-        print("💾 Flux-Anti-Branding Bild gespeichert: flux_debrand_output.png")
+        print("Flux-Anti-Branding Bild gespeichert: flux_debrand_output.png")
         
     except Exception as e:
-        print(f"❌ Fehler: {e}")
+        print(f"Fehler: {e}")
     
     finally:
         # Speicher freigeben
